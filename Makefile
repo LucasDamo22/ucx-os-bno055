@@ -270,6 +270,10 @@ vt100_term_ioctl: rebuild
 	$(CC) $(CFLAGS) -o $(BUILD_APP_DIR)/vt100_term_ioctl.o app/vt100_term_ioctl.c
 	@$(MAKE) --no-print-directory link
 
+i2c_bno055: rebuild
+	$(CC) $(CFLAGS) -o $(BUILD_APP_DIR)/i2c_bno055.o app/i2c_bno055.c
+	@$(MAKE) --no-print-directory link
+
 # clean and rebuild rules
 rebuild:
 	find '$(BUILD_APP_DIR)' -type f -name '*.o' -delete
