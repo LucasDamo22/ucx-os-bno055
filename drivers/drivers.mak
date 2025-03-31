@@ -4,12 +4,12 @@ DEVICE_DRIVERS_DIR	= $(DRIVERS_DIR)/device
 
 ddrivers:
 	$(CC) $(CFLAGS) \
+		$(DEVICE_DRIVERS_DIR)/device/device.c \
 		$(BUS_DRIVERS_DIR)/gpio/gpio.c \
 		$(BUS_DRIVERS_DIR)/i2c/i2c_bitbang.c \
 		$(BUS_DRIVERS_DIR)/spi/spi_bitbang.c \
 		$(BUS_DRIVERS_DIR)/i2c/i2c.c \
 		$(BUS_DRIVERS_DIR)/uart/uart.c \
-		$(DEVICE_DRIVERS_DIR)/device/device.c \
-		$(DEVICE_DRIVERS_DIR)/24lcxx/24lcxx.c \
-		$(DEVICE_DRIVERS_DIR)/vt100/vt100.c
+		$(DEVICE_DRIVERS_DIR)/vt100/vt100.c \
+		$(DEVICE_DRIVERS_DIR)/bno055/bno055.c
 
