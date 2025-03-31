@@ -12,7 +12,7 @@ int32_t app_main(void)
 {
 	dev_init(i2c1);
     while(1){
-        uint8_t chip_id = bno_read_reg(BNO055_CHIP_ID_ADDR);
+        uint8_t chip_id = read_reg(BNO055_CHIP_ID_ADDR);
         printf("Chip ID = %x\n", chip_id);
         if(chip_id == BNO055_ID){
             printf("correct read!\n");
