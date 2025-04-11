@@ -6,6 +6,9 @@
 // #include <i2c_ll.h>
 #include <bno055.h>
 
+
+// bno adrs last bit -> 0: write 1: read
+
 /* GPIO configuration: PB6 (scl) and PB7 (sda) - port it! */
 const struct gpio_config_s gpio_config = {
 	.config_values.port	= GPIO_PORTB,
@@ -131,4 +134,117 @@ uint8_t read_reg(adafruit_bno055_reg_t reg){
 	uint8_t byte = return_value[0];
     dev_close(i2c1);
     return byte;
+}
+
+void read_reg_buf(adafruit_bno055_reg_t reg, uint8_t num, uint16_t* arr) {
+	                        // shfiting the address and setting to write
+						// lsb = 0 means write
+    char command[2] ={((BNO055_ADDRESS_A << 1) & 0xFE), reg};
+
+    // claiming the line
+    dev_open(i2c1, 0);
+
+    // select peripheral and write memory address
+    dev_write(i2c1, command, 2);
+
+	
+    // changing the RW bit to read
+	// lsb = 1
+    command[0] = (BNO055_ADDRESS_A  << 1 ) | 1;
+
+    // restart the transaction
+    dev_write(i2c1, command, 0);
+
+    // select read mode
+    dev_write(i2c1, command, 1);
+
+    // read reg
+	uint8_t* aux = malloc(sizeof(arr)*sizeof(uint16_t)*num/2);
+    dev_read(i2c1, aux, num);
+	for (uint8_t i = 0; i < (num/2)-1; i++) {
+		arr[i] = ((uint16_t)aux[i] << 8) | aux[i+1];
+	}
+    dev_close(i2c1);
+    return;
+}
+
+
+void readMag(uint16_t* arr) {
+	uint8_t x_lsb = read_reg(BNO055_MAG_DATA_X_LSB_ADDR);
+	uint8_t x_msb = read_reg(BNO055_MAG_DATA_X_MSB_ADDR);
+	uint8_t y_lsb = read_reg(BNO055_MAG_DATA_Y_LSB_ADDR);
+	uint8_t y_msb = read_reg(BNO055_MAG_DATA_Y_MSB_ADDR);
+	uint8_t z_lsb = read_reg(BNO055_MAG_DATA_Z_LSB_ADDR);
+	uint8_t z_msb = read_reg(BNO055_MAG_DATA_Z_MSB_ADDR);
+	arr[0] = ((uint16_t)x_msb << 8) + x_lsb; // shift msb (left side of 16 bit int) << 8
+	arr[1] = ((uint16_t)y_msb << 8) + y_lsb;
+	arr[2] = ((uint16_t)z_msb << 8) + z_lsb;
+}
+
+void readMagBuf(uint8_t num, uint16_t* arr) {
+	read_reg_buf(BNO055_MAG_DATA_X_LSB_ADDR, num, arr);
+	return;
+}
+
+void readAcc(uint16_t* arr) {
+	uint8_t x_lsb = read_reg(BNO055_ACCEL_DATA_X_LSB_ADDR);
+	uint8_t x_msb = read_reg(BNO055_ACCEL_DATA_X_MSB_ADDR);
+	uint8_t y_lsb = read_reg(BNO055_ACCEL_DATA_Y_LSB_ADDR);
+	uint8_t y_msb = read_reg(BNO055_ACCEL_DATA_Y_MSB_ADDR);
+	uint8_t z_lsb = read_reg(BNO055_ACCEL_DATA_Z_LSB_ADDR);
+	uint8_t z_msb = read_reg(BNO055_ACCEL_DATA_Z_MSB_ADDR);
+	arr[0] = ((uint16_t)x_msb << 8) + x_lsb; // shift msb (left side of 16 bit int) << 8
+	arr[1] = ((uint16_t)y_msb << 8) + y_lsb;
+	arr[2] = ((uint16_t)z_msb << 8) + z_lsb;
+}
+
+void readGyro(uint16_t* arr) {
+	uint8_t x_lsb = read_reg(BNO055_GYRO_DATA_X_LSB_ADDR);
+	uint8_t x_msb = read_reg(BNO055_GYRO_DATA_X_MSB_ADDR);
+	uint8_t y_lsb = read_reg(BNO055_GYRO_DATA_Y_LSB_ADDR);
+	uint8_t y_msb = read_reg(BNO055_GYRO_DATA_Y_MSB_ADDR);
+	uint8_t z_lsb = read_reg(BNO055_GYRO_DATA_Z_LSB_ADDR);
+	uint8_t z_msb = read_reg(BNO055_GYRO_DATA_Z_MSB_ADDR);
+	arr[0] = ((uint16_t)x_msb << 8) + x_lsb; // shift msb (left side of 16 bit int) << 8
+	arr[1] = ((uint16_t)y_msb << 8) + y_lsb;
+	arr[2] = ((uint16_t)z_msb << 8) + z_lsb;
+}
+
+void readEuler(uint16_t* arr) {
+	uint8_t h_lsb = read_reg(BNO055_EULER_H_LSB_ADDR);
+	uint8_t h_msb = read_reg(BNO055_EULER_H_MSB_ADDR);
+	uint8_t r_lsb = read_reg(BNO055_EULER_R_LSB_ADDR);
+	uint8_t r_msb = read_reg(BNO055_EULER_R_MSB_ADDR);
+	uint8_t p_lsb = read_reg(BNO055_EULER_P_LSB_ADDR);
+	uint8_t p_msb = read_reg(BNO055_EULER_P_MSB_ADDR);
+	arr[0] = ((uint16_t)h_msb << 8) + h_lsb; // shift msb (left side of 16 bit int) << 8
+	arr[1] = ((uint16_t)r_msb << 8) + r_lsb;
+	arr[2] = ((uint16_t)p_msb << 8) + p_lsb;
+}
+
+void readQuat(uint16_t* arr) {
+	uint8_t w_lsb = read_reg(BNO055_QUATERNION_DATA_W_LSB_ADDR);
+	uint8_t w_msb = read_reg(BNO055_QUATERNION_DATA_W_MSB_ADDR);
+	uint8_t x_lsb = read_reg(BNO055_QUATERNION_DATA_X_LSB_ADDR);
+	uint8_t x_msb = read_reg(BNO055_QUATERNION_DATA_X_MSB_ADDR);
+	uint8_t y_lsb = read_reg(BNO055_QUATERNION_DATA_Y_LSB_ADDR);
+	uint8_t y_msb = read_reg(BNO055_QUATERNION_DATA_Y_MSB_ADDR);
+	uint8_t z_lsb = read_reg(BNO055_QUATERNION_DATA_Z_MSB_ADDR);
+	uint8_t z_msb = read_reg(BNO055_QUATERNION_DATA_Z_MSB_ADDR);
+	arr[0] = ((uint16_t)w_msb << 8) + w_lsb; // shift msb (left side of 16 bit int) << 8
+	arr[1] = ((uint16_t)x_msb << 8) + x_lsb;
+	arr[2] = ((uint16_t)y_msb << 8) + y_lsb;
+	arr[3] = ((uint16_t)z_msb << 8) + z_lsb;
+}
+
+void readGrav(uint16_t* arr) {
+	uint8_t x_lsb = read_reg(BNO055_GRAVITY_DATA_X_LSB_ADDR);
+	uint8_t x_msb = read_reg(BNO055_GRAVITY_DATA_X_MSB_ADDR);
+	uint8_t y_lsb = read_reg(BNO055_GRAVITY_DATA_Y_LSB_ADDR);
+	uint8_t y_msb = read_reg(BNO055_GRAVITY_DATA_Y_MSB_ADDR);
+	uint8_t z_lsb = read_reg(BNO055_GRAVITY_DATA_Z_MSB_ADDR);
+	uint8_t z_msb = read_reg(BNO055_GRAVITY_DATA_Z_MSB_ADDR);
+	arr[0] = ((uint16_t)x_msb << 8) + x_lsb;
+	arr[1] = ((uint16_t)y_msb << 8) + y_lsb;
+	arr[2] = ((uint16_t)z_msb << 8) + z_lsb;
 }
