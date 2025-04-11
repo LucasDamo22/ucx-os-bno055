@@ -12,14 +12,12 @@ int32_t app_main(void)
 {
 	dev_init(i2c1);
     while(1){
-        uint8_t chip_id = read_reg(BNO055_CHIP_ID_ADDR);
-        printf("Chip ID = %x\n", chip_id);
-        if(chip_id == BNO055_ID){
-            printf("correct read!\n");
-        } else {
-            printf("incorrect read :( \n");
+        uint16_t arr[3];
+        readMagBuf((uint8_t)8, &arr);
+        for (uint8_t i = 0; i < 3; i++) {
+            printf("%d", arr[i]);
         }
-        _delay_ms(5000);
+        _delay_ms(500);
     }
 	
 
