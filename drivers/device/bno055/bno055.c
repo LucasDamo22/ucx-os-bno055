@@ -101,13 +101,20 @@ const struct device_s i2c_device1 = {
 // };
 
 const struct device_s *i2c1 = &i2c_device1;
-
+void write_reg(adafruit_bno055_reg_t reg, uint8_t value){
+	char command[3] ={((BNO055_ADDRESS_A << 1) & 0xFE), reg, value};
+	 // claiming the line
+	dev_open(i2c1, 0);
+	// select peripheral and write memory address
+	dev_write(i2c1, command, 3);
+	dev_close(i2c1);
+}
 
 uint8_t read_reg(adafruit_bno055_reg_t reg){
 
                         // shfiting the address and setting to write
 						// lsb = 0 means write
-    char command[2] ={((BNO055_ADDRESS_A << 1) & 0xFE), reg};
+    
 
 	char return_value[2] = {0,0} ;
 

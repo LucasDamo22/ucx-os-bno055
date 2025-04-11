@@ -241,6 +241,7 @@ typedef enum {
   } adafruit_vector_type_t;
 
 uint8_t read_reg(adafruit_bno055_reg_t reg);
+void write_reg(adafruit_bno055_reg_t reg);
 void read_reg_buf(adafruit_bno055_reg_t reg, uint8_t num, uint16_t* arr);
 void readMagBuf(uint8_t num, uint16_t* arr);
 void readMag(uint16_t* arr);
