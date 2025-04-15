@@ -112,35 +112,33 @@ void write_reg(adafruit_bno055_reg_t reg, uint8_t value){
 
 uint8_t read_reg(adafruit_bno055_reg_t reg){
 
-                        // shfiting the address and setting to write
-						// lsb = 0 means write
-    
+  // shfiting the address and setting to write
+	// lsb = 0 means write
+  uint8_t command[2] ={((BNO055_ADDRESS_A << 1) & 0xFE), reg};
 
-	char return_value[2] = {0,0} ;
+	uint8_t return_value[2] = {0,0} ;
 
-    // claiming the line
-    dev_open(i2c1, 0);
+  // claiming the line
+  dev_open(i2c1, 0);
 
-    // select peripheral and write memory address
-    dev_write(i2c1, command, 2);
-
+  // select peripheral and write memory address
+  dev_write(i2c1, command, 2);
 	
-    // changing the RW bit to read
+  // changing the RW bit to read
 	// lsb = 1
-    command[0] = (BNO055_ADDRESS_A  << 1 ) | 1;
+  command[0] = (BNO055_ADDRESS_A  << 1 ) | 1;
 
-    // restart the transaction
-    dev_write(i2c1, command, 0);
+  // restart the transaction
+  dev_write(i2c1, command, 0);
 
-    // select read mode
-    dev_write(i2c1, command, 1);
+  // select read mode
+  dev_write(i2c1, command, 1);
 
-    // read reg
-    dev_read(i2c1, return_value, 1);
-	
-	uint8_t byte = return_value[0];
-    dev_close(i2c1);
-    return byte;
+  // read reg
+  dev_read(i2c1, return_value, 1);
+	dev_close(i2c1);
+
+	return return_value[0];
 }
 
 void read_reg_buf(adafruit_bno055_reg_t reg, uint8_t num, uint16_t* arr) {
@@ -200,9 +198,17 @@ void readAcc(uint16_t* arr) {
 	uint8_t y_msb = read_reg(BNO055_ACCEL_DATA_Y_MSB_ADDR);
 	uint8_t z_lsb = read_reg(BNO055_ACCEL_DATA_Z_LSB_ADDR);
 	uint8_t z_msb = read_reg(BNO055_ACCEL_DATA_Z_MSB_ADDR);
+  printf("x_lsb -> %d | x_msb -> %d\n", x_lsb, x_msb);
+  printf("y_lsb -> %d | y_msb -> %d\n", y_lsb, y_msb);
+  printf("z_lsb -> %d | z_msb -> %d\n", z_lsb, z_msb);
 	arr[0] = ((uint16_t)x_msb << 8) + x_lsb; // shift msb (left side of 16 bit int) << 8
 	arr[1] = ((uint16_t)y_msb << 8) + y_lsb;
 	arr[2] = ((uint16_t)z_msb << 8) + z_lsb;
+}
+
+void readAccBuf(uint8_t num, uint16_t* arr) {
+  read_reg_buf(BNO055_ACCEL_DATA_X_LSB_ADDR, num, arr);
+  return;
 }
 
 void readGyro(uint16_t* arr) {
