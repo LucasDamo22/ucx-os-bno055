@@ -278,6 +278,14 @@ i2c_bno055: rebuild
 	$(CC) $(CFLAGS) -o $(BUILD_APP_DIR)/i2c_bno055.o app/i2c_bno055.c
 	@$(MAKE) --no-print-directory link
 
+drone_flight_test: rebuild
+	$(CC) $(CFLAGS) -o $(BUILD_APP_DIR)/drone_flight_test.o app/drone_flight_test.c
+	@$(MAKE) --no-print-directory link
+
+PID_test: rebuild
+	$(CC) $(CFLAGS) -o $(BUILD_APP_DIR)/PID_test.o app/PID_test.c
+	@$(MAKE) --no-print-directory link
+
 # clean and rebuild rules
 rebuild:
 	find '$(BUILD_APP_DIR)' -type f -name '*.o' -delete
